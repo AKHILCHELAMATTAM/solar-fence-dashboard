@@ -1,0 +1,48 @@
+.topbar {
+  position: fixed;
+  z-index: 15;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.topbar__menu-btn {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.topbar__title {
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.topbar__user {
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .topbar {
+    left: var(--sidebar-width-desktop);
+  }
+}

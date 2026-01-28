@@ -1,0 +1,22 @@
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-card__title {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.summary-card__value {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.summary-card__subtitle {
+  font-size: 0.8rem;
+  color: #6b7280;
+}

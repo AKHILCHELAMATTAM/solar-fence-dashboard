@@ -1,0 +1,35 @@
+.ht-node {
+  padding: 4px 0;
+}
+
+.ht-node__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ht-node__toggle {
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 18px;
+  text-align: center;
+}
+
+.ht-node__toggle-placeholder {
+  display: inline-block;
+  width: 18px;
+}
+
+.ht-node__badge {
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.ht-node__label {
+  font-size: 0.9rem;
+}
