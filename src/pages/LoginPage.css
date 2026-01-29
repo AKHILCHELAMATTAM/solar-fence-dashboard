@@ -1,0 +1,131 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f7fa;
+  padding: 16px;
+}
+
+.login-card {
+  background-color: #ffffff;
+  border-radius: 22px;
+  padding: 24px 24px 20px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.18);
+}
+
+@media (min-width: 768px) {
+  .login-card {
+    padding: 28px 32px 24px;
+    border-radius: 24px;
+  }
+}
+
+.login-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.login-card__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+}
+
+.login-card__title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.login-card__subtitle {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.login-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.login-field__label {
+  color: #4b5563;
+}
+
+.login-field__input {
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.login-field__input::placeholder {
+  color: #9ca3af;
+}
+
+.login-field__input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1.5px rgba(37, 99, 235, 0.25);
+  background-color: #f9fafb;
+}
+
+.login-card__error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+}
+
+.login-card__button {
+  margin-top: 4px;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out,
+    opacity 0.1s ease-out;
+}
+
+.login-card__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 35px rgba(37, 99, 235, 0.5);
+}
+
+.login-card__button:active {
+  transform: translateY(1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  opacity: 0.95;
+}
+
+.login-card__button-icon {
+  font-size: 1.1rem;
+}
+
+.login-card__hint {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}

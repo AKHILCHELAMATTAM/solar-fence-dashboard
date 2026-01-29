@@ -9,7 +9,7 @@ const Topbar = ({ onMenuClick }) => {
       </button>
       <div className="topbar__title">Solar & Fence Monitoring</div>
       <div className="topbar__right">
-        <span className="topbar__user">Admin</span>
+        {/* <span className="topbar__user">Admin</span> */}
       </div>
     </header>
   );
