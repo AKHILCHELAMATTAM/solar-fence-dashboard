@@ -1,5 +1,14 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import {
+  FaTachometerAlt,
+  FaMicrochip,
+  FaBell,
+  FaMapMarkedAlt,
+  FaSitemap,
+  FaCogs,
+  FaChartBar,
+} from "react-icons/fa";
 import "./Sidebar.css";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -8,8 +17,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
         <div className="sidebar__brand">
           <span className="sidebar__logo">☀︎</span>
-          <span className="sidebar__title">Solar Fence</span>
+          <span className="sidebar__title">Wildohms Pvt Ltd</span>
         </div>
+
         <nav className="sidebar__nav">
           <NavLink
             to="/"
@@ -19,8 +29,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
+            <FaTachometerAlt className="sidebar__icon" />
             Dashboard
           </NavLink>
+
           <NavLink
             to="/devices"
             className={({ isActive }) =>
@@ -28,8 +40,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
+            <FaMicrochip className="sidebar__icon" />
             Device List
           </NavLink>
+
           <NavLink
             to="/alarms"
             className={({ isActive }) =>
@@ -37,8 +51,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
-            Alarms
+            <FaBell className="sidebar__icon" />
+            Alarm
           </NavLink>
+
           <NavLink
             to="/maps"
             className={({ isActive }) =>
@@ -46,8 +62,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
+            <FaMapMarkedAlt className="sidebar__icon" />
             Maps
           </NavLink>
+
           <NavLink
             to="/hierarchy"
             className={({ isActive }) =>
@@ -55,8 +73,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
+            <FaSitemap className="sidebar__icon" />
             Hierarchy
           </NavLink>
+
           <NavLink
             to="/configurations"
             className={({ isActive }) =>
@@ -64,8 +84,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
-            Configurations
+            <FaCogs className="sidebar__icon" />
+            Configuration
           </NavLink>
+
           <NavLink
             to="/reports"
             className={({ isActive }) =>
@@ -73,10 +95,12 @@ const Sidebar = ({ isOpen, onClose }) => {
             }
             onClick={onClose}
           >
+            <FaChartBar className="sidebar__icon" />
             Reports
           </NavLink>
         </nav>
       </div>
+
       {isOpen && <div className="sidebar__backdrop" onClick={onClose} />}
     </>
   );
