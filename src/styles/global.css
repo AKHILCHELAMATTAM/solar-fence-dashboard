@@ -213,6 +213,11 @@ a {
   font-size: 0.75rem;
 }
 
+.page-header--center {
+  justify-content: center;
+  text-align: center;
+}
+
 /* Small‑screen tweaks */
 @media (max-width: 600px) {
   .page-header {

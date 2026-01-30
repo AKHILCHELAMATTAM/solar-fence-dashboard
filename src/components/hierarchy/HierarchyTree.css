@@ -1,4 +1,4 @@
-.ht-node {
+/* .ht-node {
   padding: 4px 0;
 }
 
@@ -32,4 +32,75 @@
 
 .ht-node__label {
   font-size: 0.9rem;
+} */
+
+.ht-card {
+  padding: 16px 18px;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.ht-card:hover {
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+}
+
+/* Node layout */
+.ht-node {
+  padding: 3px 0;
+}
+
+.ht-node__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.ht-node__toggle {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  cursor: pointer;
+  width: 18px;
+  text-align: center;
+  padding: 0;
+  margin-top: 2px;
+  transition: color 0.15s ease, transform 0.05s ease;
+}
+
+.ht-node__toggle:hover {
+  color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.ht-node__toggle-placeholder {
+  display: inline-block;
+  width: 18px;
+}
+
+.ht-node__content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ht-node__badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  text-transform: capitalize;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.ht-node__label {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+/* Child connector line */
+.ht-node__children {
+  margin-left: 18px;
+  padding-left: 10px;
+  border-left: 1px dashed #e5e7eb;
+  margin-top: 3px;
 }
