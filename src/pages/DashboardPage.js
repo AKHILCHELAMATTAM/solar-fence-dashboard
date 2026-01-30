@@ -1,326 +1,348 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
   PieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
+  Label,
 } from "recharts";
-import SummaryCard from "../components/common/SummaryCard";
-import StatusBadge from "../components/common/StatusBadge";
+import { FiSearch } from "react-icons/fi";
 import { sites, devices, alarms } from "../data/sampleData";
+import "./DashboardPage.css";
 
-const DEVICE_STATUS_COLORS = ["#39B54A", "#ef4444"];
+const DEVICE_STATUS_COLORS = ["#22c55e", "#3b82f6"]; // active, inactive
 
 const DashboardPage = () => {
-  const [selectedSite, setSelectedSite] = useState("all");
-  const [powerData, setPowerData] = useState([]);
-  const [voltageData, setVoltageData] = useState([]);
+  const [selectedSiteId, setSelectedSiteId] = useState(
+    sites[0]?.id || ""
+  );
+  const [mapMode, setMapMode] = useState("map");
 
-  useEffect(() => {
-    const seed = () => {
-      const now = new Date();
-      const formatTime = (d) => d.toTimeString().slice(0, 8);
+  const formattedNow = useMemo(
+    () =>
+      new Date().toLocaleString(undefined, {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }),
+    []
+  );
 
-      const base = [];
-      for (let i = 9; i >= 0; i--) {
-        const t = new Date(now.getTime() - i * 1000);
-        base.push({
-          time: formatTime(t),
-          power: 30 + Math.random() * 20,
-          fenceVoltage: 7000 + Math.random() * 1500,
-        });
-      }
-      setPowerData(base);
-      setVoltageData(base);
-    };
-    seed();
+  const selectedSite = useMemo(
+    () => sites.find((s) => s.id === selectedSiteId) || null,
+    [selectedSiteId]
+  );
 
-    const id = setInterval(() => {
-      setPowerData((prev) => {
-        const now = new Date();
-        const formatTime = (d) => d.toTimeString().slice(0, 8);
-        const next = {
-          time: formatTime(now),
-          power: 30 + Math.random() * 20,
-        };
-        return [...prev.slice(-19), next];
-      });
-      setVoltageData((prev) => {
-        const now = new Date();
-        const formatTime = (d) => d.toTimeString().slice(0, 8);
-        const next = {
-          time: formatTime(now),
-          fenceVoltage: 7000 + Math.random() * 1500,
-        };
-        return [...prev.slice(-19), next];
-      });
-    }, 3000);
+  const siteDevices = useMemo(
+    () => devices.filter((d) => d.siteId === selectedSiteId),
+    [selectedSiteId]
+  );
 
-    return () => clearInterval(id);
-  }, []);
-
-  const filteredDevices =
-    selectedSite === "all"
-      ? devices
-      : devices.filter((d) => d.siteId === selectedSite);
-
-  const totalSites = sites.length;
-  const totalDevices = filteredDevices.length;
-  const activeDevices = filteredDevices.filter((d) => d.status === "Active")
-    .length;
-  const inactiveDevices = totalDevices - activeDevices;
+  const activeCount = siteDevices.filter((d) => d.status === "Active").length;
+  const inactiveCount = siteDevices.length - activeCount;
 
   const deviceStatusPie = [
-    { name: "Active", value: activeDevices },
-    { name: "Inactive", value: inactiveDevices },
+    { name: "Active", value: activeCount },
+    { name: "Inactive", value: inactiveCount },
   ];
 
-  const recentAlarms = [...alarms]
-    .sort(
-      (a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-    .slice(0, 5);
+  // Simple fake month stats based on power
+  const solarDevices = siteDevices.filter((d) =>
+    d.name.toLowerCase().includes("inverter")
+  );
+  const fenceDevices = siteDevices.filter((d) =>
+    d.name.toLowerCase().includes("fence")
+  );
+  const monthSolar =
+    solarDevices.length > 0
+      ? (solarDevices.reduce((sum, d) => sum + d.powerKw, 0) / 5).toFixed(2)
+      : "0.00";
+  const monthFence =
+    fenceDevices.length > 0
+      ? (fenceDevices.reduce((sum, d) => sum + d.powerKw, 0) / 5).toFixed(2)
+      : "0.00";
+
+  // Alarms for the selected site
+  const deviceIdsForSite = new Set(siteDevices.map((d) => d.id));
+  const siteAlarms = alarms.filter((a) =>
+    deviceIdsForSite.has(a.deviceId)
+  );
 
   return (
     <div className="page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Dashboard</h1>
-          <div className="text-muted">
-            Installation summary & real-time performance
-          </div>
-        </div>
-        <div>
-          <select
-            className="select"
-            value={selectedSite}
-            onChange={(e) => setSelectedSite(e.target.value)}
-          >
-            <option value="all">All Sites</option>
-            {sites.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Summary cards – already responsive using auto-fit */}
-      <div
-        className="grid"
-        style={{
-          gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
-        }}
-      >
-        <SummaryCard
-          title="Total Sites"
-          value={totalSites}
-          subtitle="Monitored locations"
-        />
-        <SummaryCard
-          title="Devices"
-          value={totalDevices}
-          subtitle={`Active: ${activeDevices} • Inactive: ${inactiveDevices}`}
-        />
-        <SummaryCard
-          title="Today Energy"
-          value="1,250 kWh"
-          subtitle="Estimated"
-        />
-        <SummaryCard
-          title="System Uptime"
-          value="99.6%"
-          subtitle="Last 30 days"
-        />
-      </div>
-
-      {/* Charts + Pie – now responsive with .grid-3-responsive */}
-      <div className="grid-3-responsive" style={{ marginTop: 16 }}>
-        {/* Real-time Solar Power */}
-        <div className="card">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 8,
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                Solar Power (kW)
-              </div>
-              <div className="text-muted">Real-time</div>
-            </div>
-          </div>
-          <div style={{ width: "100%", height: 220 }}>
-            <ResponsiveContainer>
-              <LineChart data={powerData}>
-                <XAxis dataKey="time" hide />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="power"
-                  stroke="#39B54A"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Real-time Fence Voltage */}
-        <div className="card">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 8,
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-                Fence Voltage (V)
-              </div>
-              <div className="text-muted">Real-time</div>
-            </div>
-          </div>
-          <div style={{ width: "100%", height: 220 }}>
-            <ResponsiveContainer>
-              <LineChart data={voltageData}>
-                <XAxis dataKey="time" hide />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="fenceVoltage"
-                  stroke="#0A1F44"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Device Status Pie */}
-        <div className="card">
-          <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-            Device Status
-          </div>
-          <div style={{ width: "100%", height: 200 }}>
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie
-                  data={deviceStatusPie}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={40}
-                  outerRadius={70}
-                  paddingAngle={4}
-                >
-                  {deviceStatusPie.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={DEVICE_STATUS_COLORS[index]}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div style={{ fontSize: "0.8rem" }}>
-            <div>
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 10,
-                  height: 10,
-                  backgroundColor: DEVICE_STATUS_COLORS[0],
-                  borderRadius: 999,
-                  marginRight: 6,
-                }}
-              />
-              Active: {activeDevices}
-            </div>
-            <div>
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 10,
-                  height: 10,
-                  backgroundColor: DEVICE_STATUS_COLORS[1],
-                  borderRadius: 999,
-                  marginRight: 6,
-                }}
-              />
-              Inactive: {inactiveDevices}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Alarms – wrap table for horizontal scroll on mobile */}
-      <div style={{ marginTop: 16 }} className="card">
-        <div
-          style={{
-            marginBottom: 8,
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
+      {/* HERO CARD */}
+      <section className="dash-hero">
+        <div className="dash-hero-left">
+          <div className="dash-hero-icon">☁</div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-              Recent Alarms
+            <div className="dash-hero-title">
+              Fence Cloud Monitoring System
             </div>
-            <div className="text-muted">Last 5 events</div>
+            <div className="dash-hero-subtitle">Realtime overview</div>
           </div>
         </div>
-        <div className="table-wrapper">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Device</th>
-                <th>Severity</th>
-                <th>Message</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentAlarms.map((a) => (
-                <tr key={a.id}>
-                  <td>
-                    {new Date(a.timestamp).toLocaleString(undefined, {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
-                  </td>
-                  <td>{a.deviceName}</td>
-                  <td>{a.severity}</td>
-                  <td>{a.message}</td>
-                  <td>
-                    <StatusBadge status={a.status} />
-                  </td>
-                </tr>
-              ))}
-              {recentAlarms.length === 0 && (
-                <tr>
-                  <td colSpan={5}>No alarms.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="dash-hero-right">{formattedNow}</div>
+      </section>
+
+      {/* TOP CARDS */}
+      <section className="dash-top-grid">
+        {/* Installation */}
+        <div className="card dash-card">
+          <div className="dash-card-title">Installation</div>
+          <div className="dash-card-subtitle">
+            Overall monitored infrastructure
+          </div>
+          <div className="dash-install-metric">
+            <span className="dash-install-metric-label">Total Sites</span>
+            <span className="dash-install-metric-value">
+              {sites.length}
+            </span>
+          </div>
+          <div className="dash-install-metric">
+            <span className="dash-install-metric-label">Total Devices</span>
+            <span className="dash-install-metric-value">
+              {devices.length}
+            </span>
+          </div>
         </div>
-      </div>
+
+        {/* Site Status */}
+        <div className="card dash-card">
+          <div className="dash-card-title">Site Status</div>
+          <div className="dash-card-subtitle">Select Site</div>
+          <div className="dash-site-status-select">
+            <select
+              className="select"
+              value={selectedSiteId}
+              onChange={(e) => setSelectedSiteId(e.target.value)}
+            >
+              {sites.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="dash-site-status-row">
+            <span className="dash-site-status-key">Today Solar</span>
+            <span className="dash-site-status-value">NA</span>
+          </div>
+          <div className="dash-site-status-row">
+            <span className="dash-site-status-key">Today Fence</span>
+            <span className="dash-site-status-value">NA</span>
+          </div>
+          <div className="dash-site-status-row">
+            <span className="dash-site-status-key">Month Solar</span>
+            <span className="dash-site-status-value">{monthSolar}</span>
+          </div>
+          <div className="dash-site-status-row">
+            <span className="dash-site-status-key">Month Fence</span>
+            <span className="dash-site-status-value">{monthFence}</span>
+          </div>
+        </div>
+
+        {/* Site Info */}
+        <div className="card dash-card">
+          <div className="dash-card-title">Site Info</div>
+          {selectedSite ? (
+            <div className="dash-site-info-grid">
+              <span className="dash-site-info-label">Name</span>
+              <span className="dash-site-info-value">
+                {selectedSite.name}
+              </span>
+
+              <span className="dash-site-info-label">Devices</span>
+              <span className="dash-site-info-value">
+                {siteDevices.length}
+              </span>
+
+              <span className="dash-site-info-label">Type</span>
+              <span className="dash-site-info-value">
+                {selectedSite.type || "N/A"}
+              </span>
+
+              <span className="dash-site-info-label">Address</span>
+              <span className="dash-site-info-value">
+                {selectedSite.address || "N/A"}
+              </span>
+
+              <span className="dash-site-info-label">Location</span>
+              <span className="dash-site-info-value">
+                {selectedSite.location || "N/A"}
+              </span>
+            </div>
+          ) : (
+            <div className="text-muted">No site selected.</div>
+          )}
+        </div>
+
+        {/* Device Status Donut */}
+        <div className="card dash-card">
+          <div className="dash-card-title">Device Status</div>
+          <div className="dash-device-status-wrap">
+            <div className="dash-device-status-chart">
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={deviceStatusPie}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={55}
+                    outerRadius={80}
+                    startAngle={90}
+                    endAngle={-270}
+                    paddingAngle={2}
+                    stroke="transparent"
+                  >
+                    {deviceStatusPie.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={DEVICE_STATUS_COLORS[index]}
+                      />
+                    ))}
+                    <Label
+                      position="center"
+                      content={({ viewBox }) => {
+                        if (!viewBox) return null;
+                        return (
+                          <g>
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy - 6}
+                              textAnchor="middle"
+                              fill="#111827"
+                              fontSize="12"
+                              fontWeight="600"
+                            >
+                              Active Devices:
+                            </text>
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy + 10}
+                              textAnchor="middle"
+                              fill="#111827"
+                              fontSize="13"
+                              fontWeight="700"
+                            >
+                              {activeCount} OF {siteDevices.length || 1}
+                            </text>
+                          </g>
+                        );
+                      }}
+                    />
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="dash-device-status-legend">
+              <div className="dash-device-status-legend-item">
+                <span
+                  className="dash-legend-dot"
+                  style={{ backgroundColor: DEVICE_STATUS_COLORS[0] }}
+                />
+                <span>activeDevices</span>
+              </div>
+              <div className="dash-device-status-legend-item">
+                <span
+                  className="dash-legend-dot"
+                  style={{ backgroundColor: DEVICE_STATUS_COLORS[1] }}
+                />
+                <span>inactiveDevices</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BOTTOM ROW */}
+      <section className="dash-bottom-grid">
+        {/* Device Locations */}
+        <div className="card dash-card">
+          <div className="dash-map-header">
+            <div>
+              <div className="dash-card-title">Device Locations</div>
+            </div>
+            <div className="dash-map-toggle-group">
+              <button
+                type="button"
+                className={
+                  "dash-map-toggle" +
+                  (mapMode === "map" ? " dash-map-toggle--active" : "")
+                }
+                onClick={() => setMapMode("map")}
+              >
+                Map
+              </button>
+              <button
+                type="button"
+                className={
+                  "dash-map-toggle" +
+                  (mapMode === "satellite"
+                    ? " dash-map-toggle--active"
+                    : "")
+                }
+                onClick={() => setMapMode("satellite")}
+              >
+                Satellite
+              </button>
+            </div>
+          </div>
+          <div className="dash-map-placeholder">
+            Google Map would render here ({mapMode} view)
+          </div>
+        </div>
+
+        {/* Total Site Alarms */}
+        <div className="card dash-card">
+          <div className="dash-alarms-header">
+            <div className="dash-card-title">Total Site Alarms</div>
+          </div>
+
+          {siteAlarms.length === 0 ? (
+            <div className="dash-empty-state">
+              <div className="dash-empty-icon">
+                <FiSearch />
+              </div>
+              <div className="dash-empty-title">Sorry! No Result Found</div>
+              <div className="dash-empty-text">
+                Try adjusting filters or search.
+              </div>
+            </div>
+          ) : (
+            <div className="dash-alarms-table-wrapper table-wrapper">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Sno</th>
+                    <th>DeviceId</th>
+                    <th>Last Triggered At</th>
+                    <th>Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {siteAlarms.map((a, idx) => (
+                    <tr key={a.id}>
+                      <td>{idx + 1}</td>
+                      <td>{a.deviceId}</td>
+                      <td>
+                        {new Date(a.timestamp).toLocaleString(undefined, {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                      </td>
+                      <td>{a.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

@@ -49,9 +49,14 @@ a {
   }
 }
 
-.page {
+/* .page {
   max-width: 1200px;
   margin: 0 auto 24px;
+} */
+
+.page {
+  /* remove max-width and auto centering */
+  margin-bottom: 24px;   /* keep only bottom spacing */
 }
 
 .page-header {

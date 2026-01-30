@@ -1,7 +1,31 @@
+// export const sites = [
+//   { id: "site-1", name: "North Solar Farm" },
+//   { id: "site-2", name: "East Perimeter" },
+//   { id: "site-3", name: "West Yard" },
+// ];
+
 export const sites = [
-  { id: "site-1", name: "North Solar Farm" },
-  { id: "site-2", name: "East Perimeter" },
-  { id: "site-3", name: "West Yard" },
+  {
+    id: "site-1",
+    name: "Safari Reserve North",
+    type: "Wildlife Reserve",
+    address: "123 Wildlife Road, Kenya",
+    location: "-1.2345, 36.7890",
+  },
+  {
+    id: "site-2",
+    name: "East Perimeter",
+    type: "Perimeter Fence",
+    address: "Industrial Area, Plot 7",
+    location: "-1.2450, 36.8123",
+  },
+  {
+    id: "site-3",
+    name: "West Yard",
+    type: "Solar Yard",
+    address: "West Yard, Phase 2",
+    location: "-1.2288, 36.7800",
+  },
 ];
 
 export const devices = [
