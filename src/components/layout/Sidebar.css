@@ -78,7 +78,7 @@
 
 
 /* Desktop */
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   .sidebar {
     position: sticky;
     transform: translateX(0);
@@ -90,5 +90,16 @@
 
   .app-main {
     margin-left: var(--sidebar-width-desktop);
+  }
+} */
+
+@media (min-width: 1024px) {
+  .sidebar {
+    position: sticky;
+    transform: translateX(0);
+  }
+
+  .app-main {
+    margin-left: 0; /* ✅ REMOVE the extra space */
   }
 }
